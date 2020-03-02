@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase/services/auth.dart';
 
-class SignIn extends StatefulWidget {
+class Register extends StatefulWidget {
 
   final Function toggleView;
-  SignIn({this.toggleView});
+  Register({this.toggleView});
 
   @override
-  _SignInState createState() => _SignInState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _SignInState extends State<SignIn> {
+class _RegisterState extends State<Register> {
+
   final AuthService _auth = AuthService();
+  final _formKey = GlobalKey<FormState>();
 
   String email = '';
   String password = '';
+  String error = '';
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +26,11 @@ class _SignInState extends State<SignIn> {
       appBar: AppBar(
         backgroundColor: Colors.brown[400],
         elevation: 0.0,
-        title: Text('Sign In To Brew Crew'),
+        title: Text('Sign Up To Brew Crew'),
         actions: <Widget>[
           FlatButton.icon(
             icon: Icon(Icons.person),
-            label: Text('Register'),
+            label: Text('Sign In'),
             onPressed: (){
               widget.toggleView();
             },
@@ -37,12 +40,14 @@ class _SignInState extends State<SignIn> {
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
         child: Form(
+          key: _formKey,
           child: Column(
             children: <Widget>[
               SizedBox(
                 height: 20,
               ),
               TextFormField(
+                validator: (val) => val.isEmpty ? 'Enter an email': null,
                 onChanged: (val) {
                   setState(() {
                     email = val;
@@ -53,6 +58,7 @@ class _SignInState extends State<SignIn> {
                 height: 20,
               ),
               TextFormField(
+                validator: (val) => val.length < 6 ? 'Enter a password 6 char long' : null,
                 obscureText: true,
                 onChanged: (val) {
                   setState(() {
@@ -66,12 +72,18 @@ class _SignInState extends State<SignIn> {
               RaisedButton(
                 color: Colors.pink[400],
                 child: Text(
-                  'Sign In',
+                  'Register',
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: ()async{
-                  print(email);
-                  print(password);
+                  if(_formKey.currentState.validate()){
+                    dynamic result = await _auth.registerWithEmailAndPassword(email, password);
+                    if(result == null){
+                      setState(() {
+                        error = 'There is an error occured';
+                      });
+                    }
+                  }
                 },
               ),
             ],
