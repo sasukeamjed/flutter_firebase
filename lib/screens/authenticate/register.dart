@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase/services/auth.dart';
+import 'package:flutter_firebase/shared/constants.dart';
 
 class Register extends StatefulWidget {
-
   final Function toggleView;
+
   Register({this.toggleView});
 
   @override
@@ -11,7 +12,6 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
 
@@ -31,7 +31,7 @@ class _RegisterState extends State<Register> {
           FlatButton.icon(
             icon: Icon(Icons.person),
             label: Text('Sign In'),
-            onPressed: (){
+            onPressed: () {
               widget.toggleView();
             },
           ),
@@ -47,7 +47,8 @@ class _RegisterState extends State<Register> {
                 height: 20,
               ),
               TextFormField(
-                validator: (val) => val.isEmpty ? 'Enter an email': null,
+                decoration: textInputDecoration.copyWith(hintText: 'Email'),
+                validator: (val) => val.isEmpty ? 'Enter an email' : null,
                 onChanged: (val) {
                   setState(() {
                     email = val;
@@ -58,7 +59,9 @@ class _RegisterState extends State<Register> {
                 height: 20,
               ),
               TextFormField(
-                validator: (val) => val.length < 6 ? 'Enter a password 6 char long' : null,
+                decoration: textInputDecoration.copyWith(hintText: 'Password'),
+                validator: (val) =>
+                    val.length < 6 ? 'Enter a password 6 char long' : null,
                 obscureText: true,
                 onChanged: (val) {
                   setState(() {
@@ -75,16 +78,27 @@ class _RegisterState extends State<Register> {
                   'Register',
                   style: TextStyle(color: Colors.white),
                 ),
-                onPressed: ()async{
-                  if(_formKey.currentState.validate()){
-                    dynamic result = await _auth.registerWithEmailAndPassword(email, password);
-                    if(result == null){
+                onPressed: () async {
+                  if (_formKey.currentState.validate()) {
+                    dynamic result = await _auth.registerWithEmailAndPassword(
+                        email, password);
+                    if (result == null) {
                       setState(() {
                         error = 'There is an error occured';
                       });
                     }
                   }
                 },
+              ),
+              SizedBox(
+                height: 12.0,
+              ),
+              Text(
+                error,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 14.0,
+                ),
               ),
             ],
           ),
